@@ -1,0 +1,159 @@
+# Configuration optimized for GitHub Codespaces (CPU training)
+
+# Data Configuration
+data:
+  dataset_name: "BBBP"
+  data_dir: "data"
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  download_url: "https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/BBBP.csv"
+
+  # Train/Val/Test split ratios
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+
+  # Random seed for reproducibility
+  random_seed: 42
+
+  # Data processing
+  max_molecules: null  # Use all data
+  remove_invalid_smiles: true
+
+# Feature Engineering - Reduced feature size for faster CPU training
+features:
+  # Morgan fingerprints - reduced size for speed
+  use_morgan_fingerprints: true
+  morgan_radius: 2
+  morgan_bits: 512  # Reduced from 1024 for faster training
+
+  # Molecular descriptors
+  use_descriptors: true
+  descriptor_list:
+    - "MolWt"
+    - "LogP"
+    - "NumHDonors"
+    - "NumHAcceptors"
+    - "TPSA"
+    - "NumRotatableBonds"
+
+  # Feature scaling
+  scale_features: true
+  scaler_type: "standard"
+
+# Model Architecture - Smaller model for CPU
+model:
+  name: "MoleculeNet"
+  input_size: 200
+  hidden_sizes: [64, 32]  # Smaller than default [128, 64]
+  num_classes: 2
+  dropout: 0.3
+  activation: "relu"
+  batch_norm: true
+
+# Training Configuration - Optimized for CPU
+training:
+  # Optimization
+  optimizer: "adam"
+  learning_rate: 0.001
+  weight_decay: 1e-5
+
+  # Learning rate scheduling
+  use_scheduler: true
+  scheduler_type: "reduce_on_plateau"
+  scheduler_patience: 10
+  scheduler_factor: 0.5
+
+  # Training parameters - adjusted for CPU
+  num_epochs: 50  # Reduced from 100 for faster training
+  batch_size: 64  # Larger batches work well on CPU
+  shuffle: true
+  num_workers: 2  # Codespaces typically have 2 cores
+
+  # Early stopping
+  early_stopping: true
+  patience: 15
+  min_delta: 0.001
+
+  # Gradient clipping
+  gradient_clipping: true
+  max_grad_norm: 1.0
+
+  # Class weights
+  use_class_weights: true
+
+  # Device - Force CPU for Codespaces
+  device: "cpu"
+
+  # Mixed precision - disabled for CPU
+  use_amp: false
+
+  # Reproducibility
+  seed: 42
+
+# Evaluation Configuration
+evaluation:
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1"
+    - "roc_auc"
+    - "confusion_matrix"
+
+  threshold: 0.5
+  save_predictions: true
+
+# Checkpointing
+checkpointing:
+  save_dir: "models/checkpoints"
+  save_frequency: 10  # Save less frequently
+  save_best_only: true
+  monitor: "val_loss"
+  mode: "min"
+
+# Model Saving
+model_save:
+  save_dir: "models/saved_models"
+  save_format: "pth"
+  save_final: true
+  save_best: true
+
+# Logging Configuration
+logging:
+  log_dir: "logs"
+  log_level: "INFO"
+  log_to_file: true
+  log_to_console: true
+
+  # TensorBoard
+  use_tensorboard: true
+  tensorboard_dir: "runs"
+
+  # Weights & Biases (optional)
+  use_wandb: false
+  wandb_project: "molecule-property-prediction"
+  wandb_entity: null
+
+# Visualization
+visualization:
+  results_dir: "results"
+  figures_dir: "results/figures"
+  metrics_dir: "results/metrics"
+
+  # Plot settings
+  dpi: 150  # Lower DPI for faster rendering
+  figure_format: "png"
+  style: "seaborn-v0_8"
+
+  # Generate plots
+  plot_training_curves: true
+  plot_confusion_matrix: true
+  plot_roc_curve: true
+  plot_feature_importance: false
+
+# Prediction Configuration
+prediction:
+  batch_size: 64
+  confidence_threshold: 0.7
+  return_probabilities: true
