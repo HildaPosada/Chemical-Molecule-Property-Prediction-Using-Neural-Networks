@@ -1,5 +1,9 @@
 """Script to evaluate trained model."""
 
+from src.utils import load_config, setup_logger
+from src.evaluation import Evaluator, Visualizer
+from src.models import create_model
+from src.data import MoleculeDataLoader, MoleculePreprocessor, MoleculeDataset, create_dataloaders
 import os
 import sys
 import argparse
@@ -7,19 +11,17 @@ import torch
 import json
 
 # Add parent directory to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '..')))
 
-from src.data import MoleculeDataLoader, MoleculePreprocessor, MoleculeDataset, create_dataloaders
-from src.models import create_model
-from src.evaluation import Evaluator, Visualizer
-from src.utils import load_config, setup_logger
 
 logger = setup_logger()
 
 
 def main():
     """Evaluate trained model."""
-    parser = argparse.ArgumentParser(description='Evaluate molecular property prediction model')
+    parser = argparse.ArgumentParser(
+        description='Evaluate molecular property prediction model')
     parser.add_argument(
         '--model-path',
         type=str,
@@ -58,9 +60,11 @@ def main():
     preprocessor.load_scaler(scaler_path)
 
     # Process data
-    X_train, y_train, _ = preprocessor.process_dataframe(train_df, fit_scaler=False)
+    X_train, y_train, _ = preprocessor.process_dataframe(
+        train_df, fit_scaler=False)
     X_val, y_val, _ = preprocessor.process_dataframe(val_df, fit_scaler=False)
-    X_test, y_test, _ = preprocessor.process_dataframe(test_df, fit_scaler=False)
+    X_test, y_test, _ = preprocessor.process_dataframe(
+        test_df, fit_scaler=False)
 
     # Create datasets
     train_dataset = MoleculeDataset(X_train, y_train)
@@ -108,7 +112,11 @@ def main():
     evaluator = Evaluator(model, device)
 
     # Evaluate
-    metrics = evaluator.evaluate(data_loader_obj)
+    metrics = evaluator.evaluate(
+        data_loader_obj,
+        metrics=['accuracy', 'precision', 'recall',
+                 'f1', 'roc_auc', 'confusion_matrix']
+    )
 
     # Print results
     logger.info("\n" + "="*50)
@@ -143,7 +151,8 @@ def main():
     visualizer = Visualizer(save_dir=config['visualization']['figures_dir'])
 
     # Get predictions for visualization
-    predictions, probabilities, true_labels = evaluator.predict(data_loader_obj)
+    predictions, probabilities, true_labels = evaluator.predict(
+        data_loader_obj)
 
     # Plot confusion matrix
     visualizer.plot_confusion_matrix(
@@ -164,7 +173,8 @@ def main():
         save_name=f'{args.split}_metrics.png'
     )
 
-    logger.info(f"Visualizations saved to {config['visualization']['figures_dir']}")
+    logger.info(
+        f"Visualizations saved to {config['visualization']['figures_dir']}")
     logger.info("\nEvaluation complete!")
 
 
