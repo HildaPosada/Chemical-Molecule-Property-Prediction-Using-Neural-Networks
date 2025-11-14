@@ -169,8 +169,7 @@ class Trainer:
                 self.optimizer,
                 mode='min',
                 factor=self.train_config.get('scheduler_factor', 0.5),
-                patience=self.train_config.get('scheduler_patience', 10),
-                verbose=True
+                patience=self.train_config.get('scheduler_patience', 10)
             )
         elif scheduler_type == 'step':
             scheduler = optim.lr_scheduler.StepLR(
