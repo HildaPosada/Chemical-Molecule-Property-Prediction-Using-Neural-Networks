@@ -108,12 +108,21 @@ Dense(64) → BatchNorm → ReLU → Dropout(0.3)
 Dense(2) → Softmax → Prediction (BBB+/BBB-)
 ```
 
-### Training Strategy
-- **Optimizer:** Adam (lr=0.001, weight_decay=1e-5)
-- **Loss:** Cross-entropy with class weighting (handles imbalanced data)
-- **Regularization:** Dropout + L2 weight decay + gradient clipping
-- **Callbacks:** Early stopping, ReduceLROnPlateau, model checkpointing
-- **Monitoring:** TensorBoard integration
+### Results Visualizations
+
+**Confusion Matrix**
+
+![Confusion Matrix](results/figures/test_confusion_matrix.png)
+
+**ROC Curve**
+
+![ROC Curve](results/figures/test_roc_curve.png)
+
+**Performance Metrics**
+
+![Performance Metrics](results/figures/test_metrics.png)
+
+## Technical Stack
 
 ---
 
