@@ -17,6 +17,20 @@ A deep learning project that predicts molecular properties (Blood-Brain Barrier 
 - **End-to-End Pipeline:** Data preprocessing, model training, evaluation, and inference
 - **Production Ready:** Includes model checkpointing, logging, and configuration management
 - **Visualization:** Comprehensive performance metrics and training analytics
+- **GitHub Codespaces Ready:** One-click setup, no local installation needed!
+
+## 🚀 Quick Start with GitHub Codespaces (Recommended)
+
+**No local setup required!** Train your model in the cloud:
+
+1. Click the green **"Code"** button on GitHub
+2. Select **"Codespaces"** → **"Create codespace"**
+3. Wait ~3 minutes for automatic setup
+4. Run: `python scripts/download_data.py && python scripts/train.py --config config/config_codespaces.yaml`
+
+**Training time**: ~20-30 minutes on Codespaces CPU
+
+👉 **[See detailed Codespaces guide](CODESPACES_QUICKSTART.md)**
 
 ## Dataset
 
