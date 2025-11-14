@@ -4,89 +4,109 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Abstract
+> **A production-grade deep learning system for predicting blood-brain barrier penetration from molecular structure. Achieved 85.1% accuracy with 93.2% precision on the MoleculeNet BBBP benchmark.**
 
-A production-grade deep learning system for predicting blood-brain barrier (BBB) penetration from molecular structure. This project bridges computational chemistry and neural networks to address a critical challenge in pharmaceutical drug development—screening molecules for central nervous system (CNS) drug candidates without expensive in vitro or in vivo testing.
+## Quick Overview
 
-The implementation achieves **85.1% classification accuracy** and **0.90 ROC-AUC** on the MoleculeNet BBBP benchmark, demonstrating that neural networks trained on molecular fingerprints can effectively predict BBB permeability with performance comparable to published research.
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Predict whether drug molecules can cross the blood-brain barrier (critical for CNS drugs) |
+| **Approach** | Neural network trained on molecular fingerprints (RDKit) + physicochemical descriptors |
+| **Results** | 85.1% accuracy, 0.90 ROC-AUC, **93.2% precision** |
+| **Tech Stack** | PyTorch, RDKit, Scikit-learn, TensorBoard |
+| **Impact** | Reduces expensive laboratory screening; demonstrates ML + chemistry integration |
 
-## Motivation
+## Why This Matters
 
-Blood-brain barrier penetration is a critical property for neurological drug development. Traditional experimental methods require:
-- Weeks to months of laboratory testing per compound
-- Significant financial investment ($10,000+ per molecule)
-- Animal models or complex in vitro assays
+Blood-brain barrier (BBB) penetration prediction accelerates neurological drug development by:
+- **Reducing costs:** Eliminates need for expensive in vitro/in vivo testing ($10,000+ per compound)
+- **Accelerating timelines:** Screen thousands of candidates in minutes vs. weeks
+- **Improving success rates:** High precision (93.2%) minimizes false positives
 
-Machine learning approaches can screen thousands of candidates in minutes, enabling:
-- Rapid lead optimization in drug discovery pipelines
-- Reduced R&D costs by filtering unpromising candidates early
-- Acceleration of neurological drug development timelines
+**Relevance to Quantum Computing:** Molecular property prediction is foundational to quantum chemistry simulations—understanding molecular behavior is essential for quantum computing applications in materials science and drug discovery.
 
-This project demonstrates end-to-end capability in applying deep learning to molecular science—a critical skill set for emerging fields like quantum computing applications in chemistry and materials science.
-
-## Technical Implementation
-
-### Architecture
-
-**Feature Extraction Pipeline:**
-- **Input:** SMILES (Simplified Molecular Input Line Entry System) strings
-- **Molecular Fingerprints:** 1024-bit Morgan circular fingerprints (radius=2)
-- **Physicochemical Descriptors:** 8 computed features (LogP, molecular weight, H-bond donors/acceptors, TPSA, rotatable bonds, aromatic rings, sp³ carbons)
-- **Preprocessing:** StandardScaler normalization, stratified train/val/test splitting
-
-**Neural Network:**
-```
-Input Layer (1032 features)
-    ↓
-Dense(128) → BatchNorm → ReLU → Dropout(0.3)
-    ↓
-Dense(64) → BatchNorm → ReLU → Dropout(0.3)
-    ↓
-Dense(2) → Softmax
-```
-
-**Training Infrastructure:**
-- **Optimizer:** Adam (lr=0.001, weight_decay=1e-5)
-- **Loss:** Cross-entropy with class weighting
-- **Regularization:** Dropout, L2 weight decay, gradient clipping
-- **Callbacks:** Early stopping (patience=15), ReduceLROnPlateau
-- **Monitoring:** TensorBoard integration for real-time metrics
-
-### Dataset
-
-**MoleculeNet BBBP Benchmark**
-- **Size:** 2,039 molecules (binary classification)
-- **Source:** Curated from peer-reviewed experimental data
-- **Split:** 70% train / 15% validation / 15% test (stratified)
-- **Class Distribution:** 1,562 BBB+ / 477 BBB- (balanced via class weights)
+---
 
 ## Performance Results
 
 ### Classification Metrics
 
-| Metric | Score |
-|--------|-------|
-| **Accuracy** | 85.1% |
-| **ROC-AUC** | 0.90 |
-| **Precision** | 93.2% |
-| **Recall** | 86.8% |
-| **F1-Score** | 89.9% |
+| Metric | Score | Why It Matters |
+|--------|-------|----------------|
+| **Accuracy** | 85.1% | Overall correctness |
+| **Precision** | **93.2%** | Low false positives (critical for drug screening) |
+| **Recall** | 86.8% | Captures most viable candidates |
+| **F1-Score** | 89.9% | Balanced performance |
+| **ROC-AUC** | 0.90 | Strong discrimination ability |
 
-### Training Characteristics
-
-- **Convergence:** 50 epochs (Codespaces CPU training)
-- **Training Time:** ~30 minutes (GitHub Codespaces 2-core)
-- **Model Size:** 35,554 parameters (compact architecture)
-- **Feature Dimension:** 518 (512-bit fingerprints + 6 descriptors)
+### Training Details
+- **Dataset:** 2,039 molecules from MoleculeNet BBBP benchmark
+- **Training Time:** 30 minutes on GitHub Codespaces (2-core CPU)
+- **Model Size:** 35,554 parameters (compact and efficient)
+- **Convergence:** 50 epochs with early stopping capability
 
 ### Comparative Performance
+```
+MoleculeNet Baseline (2018):  ~88% accuracy
+This Implementation:          85.1% accuracy (93.2% precision)
+Graph Neural Networks (SOTA): ~90-92% accuracy
+```
 
-This implementation achieves competitive performance with published benchmarks:
-- **MoleculeNet baseline (2018):** ~88% accuracy
-- **This implementation:** 85.1% accuracy (93.2% precision)
-- **Graph neural networks (SOTA):** ~90-92% accuracy
+Results demonstrate that engineered molecular fingerprints with standard neural networks achieve competitive performance while remaining interpretable and computationally efficient.
 
-The results demonstrate that well-engineered traditional fingerprints with standard neural networks can approach state-of-the-art performance, while being significantly simpler to implement and interpret than graph-based methods.
+---
+
+## Visualizations
+
+<table>
+<tr>
+<td width="33%">
+
+**Confusion Matrix**
+![Confusion Matrix](results/figures/test_confusion_matrix.png)
+Strong true positive rate (204) with minimal false positives (15)
+
+</td>
+<td width="33%">
+
+**ROC Curve**
+![ROC Curve](results/figures/test_roc_curve.png)
+AUC = 0.90 shows excellent discrimination
+
+</td>
+<td width="33%">
+
+**Performance Metrics**
+![Metrics](results/figures/test_metrics.png)
+Comprehensive evaluation across all metrics
+
+</td>
+</tr>
+</table>
+
+---
+
+## Technical Architecture
+
+### Feature Pipeline
+```
+SMILES String → RDKit Processing → Feature Engineering → Neural Network → Prediction
+                                    ↓
+                    • 512-bit Morgan fingerprints (molecular structure)
+                    • 6 physicochemical descriptors (LogP, MW, H-bonds, TPSA, etc.)
+                    • StandardScaler normalization
+```
+
+### Neural Network Architecture
+```
+Input (518 features)
+    ↓
+Dense(128) → BatchNorm → ReLU → Dropout(0.3)
+    ↓
+Dense(64) → BatchNorm → ReLU → Dropout(0.3)
+    ↓
+Dense(2) → Softmax → Prediction (BBB+/BBB-)
+```
 
 ### Results Visualizations
 
@@ -104,85 +124,53 @@ The results demonstrate that well-engineered traditional fingerprints with stand
 
 ## Technical Stack
 
-| Component | Technology |
-|-----------|-----------|
-| **Deep Learning** | PyTorch 2.0+ |
-| **Cheminformatics** | RDKit |
-| **Numerical Computing** | NumPy, Pandas |
-| **Machine Learning** | Scikit-learn |
-| **Visualization** | Matplotlib, Seaborn |
-| **Experiment Tracking** | TensorBoard |
-| **Data Storage** | SQLite |
-| **Configuration** | YAML |
+---
 
 ## Project Structure
 
 ```
-├── src/
+├── src/                    # Core implementation
 │   ├── data/              # Data loading, SMILES processing, feature extraction
 │   ├── models/            # Neural network architectures
 │   ├── training/          # Training loops, callbacks, optimization
 │   ├── evaluation/        # Metrics computation, visualization
 │   └── utils/             # Configuration, logging, device management
-├── scripts/               # CLI tools for training, evaluation, inference
-├── config/                # Hyperparameter configurations
-├── notebooks/             # Exploratory analysis and experimentation
-└── tests/                 # Unit tests
+├── scripts/               # Command-line tools (train, evaluate, predict)
+├── config/                # YAML configurations
+├── results/               # Visualizations and metrics
+├── models/                # Trained model checkpoints
+└── notebooks/             # Exploratory analysis
 ```
 
-## Key Features
+---
 
-**Production-Ready Infrastructure:**
-- Modular, object-oriented design for maintainability
-- Comprehensive logging and error handling
-- Configuration management via YAML
-- Reproducible experiments (fixed random seeds)
-- Model versioning and checkpointing
+## Quick Start
 
-**Advanced Training Techniques:**
-- Learning rate scheduling with plateau detection
-- Early stopping to prevent overfitting
-- Gradient clipping for stability
-- Class-weighted loss for imbalanced data
-- TensorBoard integration for monitoring
-
-**Robust Evaluation:**
-- Multiple performance metrics (accuracy, precision, recall, F1, ROC-AUC)
-- Confusion matrix analysis
-- ROC curve visualization
-- Cross-validation ready architecture
-
-## Installation & Usage
-
-### Quick Setup
-
+### Option 1: GitHub Codespaces (Recommended)
 ```bash
-# Clone repository
+# Open in Codespaces → auto-setup in ~3 minutes
+python scripts/download_data.py
+python scripts/train.py --config config/config_codespaces.yaml
+```
+
+### Option 2: Local Installation
+```bash
+# Clone and setup
 git clone https://github.com/HildaPosada/Chemical-Molecule-Property-Prediction-Using-Neural-Networks.git
 cd Chemical-Molecule-Property-Prediction-Using-Neural-Networks
 
-# Install dependencies (conda recommended for RDKit)
+# Install dependencies
 conda create -n molecule-pred python=3.9
 conda activate molecule-pred
 conda install -c conda-forge rdkit
 pip install -r requirements.txt
 
-# Download data and train
+# Train model
 python scripts/download_data.py
 python scripts/train.py
 ```
 
-### GitHub Codespaces
-
-For cloud-based training without local setup:
-1. Open repository in GitHub Codespaces
-2. Environment auto-configures in ~3 minutes
-3. Run: `python scripts/train.py --config config/config_codespaces.yaml`
-
-Detailed setup instructions: [CODESPACES_QUICKSTART.md](CODESPACES_QUICKSTART.md)
-
 ### Command-Line Interface
-
 ```bash
 # Training
 python scripts/train.py --config config/config.yaml --epochs 100
@@ -190,74 +178,61 @@ python scripts/train.py --config config/config.yaml --epochs 100
 # Evaluation
 python scripts/evaluate.py --model-path models/checkpoints/best_model.pth
 
-# Inference
+# Prediction
 python scripts/predict.py --smiles "CC(C)Cc1ccc(cc1)C(C)C(O)=O"  # Ibuprofen
-python scripts/predict.py --input-file molecules.csv --output predictions.csv
 ```
+
+---
+
+## Key Technical Highlights
+
+**Deep Learning Expertise:**
+- PyTorch model development with custom architectures
+- Advanced training techniques (LR scheduling, early stopping, gradient clipping)
+- Production-ready MLOps practices (checkpointing, logging, reproducibility)
+
+**Cheminformatics Knowledge:**
+- SMILES processing and validation
+- Molecular fingerprint generation (RDKit Morgan fingerprints)
+- Physicochemical descriptor calculation
+- Understanding of drug ADME properties
+
+**Software Engineering:**
+- Modular, object-oriented architecture
+- Configuration management (YAML)
+- Comprehensive testing and error handling
+- CLI tools for all operations
+
+**Data Science:**
+- Handling imbalanced datasets (class weighting)
+- Feature engineering from molecular structures
+- Stratified train/val/test splitting
+- Multiple evaluation metrics
+
+---
 
 ## Applications
 
 **Pharmaceutical Industry:**
 - Early-stage drug candidate screening
 - Lead optimization in CNS drug discovery
-- ADME (Absorption, Distribution, Metabolism, Excretion) prediction
+- Virtual screening of chemical libraries
 
-**Research Applications:**
+**Research:**
 - Computational toxicology
-- QSAR (Quantitative Structure-Activity Relationship) modeling
-- Chemical library virtual screening
+- QSAR modeling
+- Integration with quantum chemistry simulations
 
-**Extensibility:**
-- Transfer learning to other molecular properties
-- Ensemble methods for uncertainty quantification
-- Integration with quantum chemistry calculations
-
-## Future Development
-
-**Model Enhancements:**
-- Graph Neural Networks (GNN) for superior molecular representation
-- Attention mechanisms for interpretability
-- Multi-task learning across multiple molecular properties
-- Uncertainty quantification via Bayesian approaches
-
-**Infrastructure:**
-- REST API deployment (FastAPI)
-- Containerization (Docker)
-- Model serving at scale
-- Integration with molecular dynamics simulations
-
-**Advanced Techniques:**
-- SHAP/LIME for model explainability
-- Active learning for data-efficient training
-- Few-shot learning for rare property prediction
-
-## Technical Highlights
-
-This project demonstrates proficiency in:
-
-✓ **Deep Learning:** PyTorch model development, training optimization, regularization
-✓ **Cheminformatics:** SMILES processing, molecular fingerprints, descriptor calculation
-✓ **Software Engineering:** Modular architecture, configuration management, CLI tools
-✓ **Data Science:** Feature engineering, imbalanced data handling, performance evaluation
-✓ **MLOps:** Experiment tracking, model checkpointing, reproducibility
-✓ **Domain Knowledge:** Understanding of drug discovery, BBB biology, ADME properties
+---
 
 ## References
 
-**Dataset:**
-- Wu, Z. et al. (2018). "MoleculeNet: A Benchmark for Molecular Machine Learning." *Chemical Science*, 9(2), 513-530.
-
-**Methodology:**
-- Rogers, D. & Hahn, M. (2010). "Extended-Connectivity Fingerprints." *Journal of Chemical Information and Modeling*, 50(5), 742-754.
-
-**Related Work:**
-- Deep learning applications in drug discovery
-- Neural network approaches to QSAR modeling
-- Molecular representation learning
+- **Wu, Z. et al. (2018).** "MoleculeNet: A Benchmark for Molecular Machine Learning." *Chemical Science*, 9(2), 513-530.
+- **Rogers, D. & Hahn, M. (2010).** "Extended-Connectivity Fingerprints." *J. Chem. Inf. Model.*, 50(5), 742-754.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License - see [LICENSE](LICENSE)
 
 ## Contact
 
@@ -267,4 +242,4 @@ Bridging Chemistry and Machine Learning
 
 ---
 
-*This project showcases the intersection of computational chemistry and deep learning—a foundation for emerging applications in quantum computing, materials science, and AI-driven drug discovery.*
+*This project demonstrates the intersection of computational chemistry and deep learning—foundational skills for quantum computing applications in molecular science and materials discovery.*
