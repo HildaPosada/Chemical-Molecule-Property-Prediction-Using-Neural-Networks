@@ -111,7 +111,7 @@ class Trainer:
     def _create_optimizer(self) -> optim.Optimizer:
         """Create optimizer from config."""
         optimizer_name = self.train_config['optimizer'].lower()
-        lr = self.train_config['learning_rate']
+        lr = float(self.train_config['learning_rate'])
         weight_decay = float(self.train_config.get('weight_decay', 0.0))
 
         if optimizer_name == 'adam':
