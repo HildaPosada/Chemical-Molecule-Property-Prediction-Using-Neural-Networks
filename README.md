@@ -8,7 +8,7 @@
 
 A production-grade deep learning system for predicting blood-brain barrier (BBB) penetration from molecular structure. This project bridges computational chemistry and neural networks to address a critical challenge in pharmaceutical drug development—screening molecules for central nervous system (CNS) drug candidates without expensive in vitro or in vivo testing.
 
-The implementation achieves **87.3% classification accuracy** and **0.91 ROC-AUC** on the MoleculeNet BBBP benchmark, demonstrating that neural networks trained on molecular fingerprints can effectively predict BBB permeability with performance comparable to published research.
+The implementation achieves **85.1% classification accuracy** and **0.90 ROC-AUC** on the MoleculeNet BBBP benchmark, demonstrating that neural networks trained on molecular fingerprints can effectively predict BBB permeability with performance comparable to published research.
 
 ## Motivation
 
@@ -66,24 +66,25 @@ Dense(2) → Softmax
 
 | Metric | Score |
 |--------|-------|
-| **Accuracy** | 87.3% |
-| **ROC-AUC** | 0.91 |
-| **Precision** | 0.85 |
-| **Recall** | 0.89 |
-| **F1-Score** | 0.87 |
+| **Accuracy** | 85.1% |
+| **ROC-AUC** | 0.90 |
+| **Precision** | 93.2% |
+| **Recall** | 86.8% |
+| **F1-Score** | 89.9% |
 
 ### Training Characteristics
 
-- **Convergence:** 45 epochs (early stopping triggered)
-- **Training Time:** 15 minutes (Apple M2) / 28 minutes (CPU)
-- **Final Loss:** Train 0.31 / Validation 0.38
-- **Generalization Gap:** 0.07 (indicates good regularization)
+- **Convergence:** 20 epochs (trained to completion)
+- **Training Time:** ~35 minutes (GitHub Codespaces CPU)
+- **Final Loss:** Train 0.089 / Validation 0.515
+- **Best Validation Accuracy:** 88.6% (epoch 11-12)
+- **Learning Rate Decay:** Triggered at epoch 16 (0.001 → 0.0005)
 
 ### Comparative Performance
 
 This implementation achieves competitive performance with published benchmarks:
 - **MoleculeNet baseline (2018):** ~88% accuracy
-- **This implementation:** 87.3% accuracy
+- **This implementation:** 85.1% accuracy
 - **Graph neural networks (SOTA):** ~90-92% accuracy
 
 The results demonstrate that well-engineered traditional fingerprints with standard neural networks can approach state-of-the-art performance, while being significantly simpler to implement and interpret than graph-based methods.
