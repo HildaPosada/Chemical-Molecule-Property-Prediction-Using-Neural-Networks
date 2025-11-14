@@ -111,8 +111,8 @@ class Trainer:
     def _create_optimizer(self) -> optim.Optimizer:
         """Create optimizer from config."""
         optimizer_name = self.train_config['optimizer'].lower()
-        lr = self.train_config['learning_rate']
-        weight_decay = self.train_config.get('weight_decay', 0.0)
+        lr = float(self.train_config['learning_rate'])
+        weight_decay = float(self.train_config.get('weight_decay', 0.0))
 
         if optimizer_name == 'adam':
             optimizer = optim.Adam(
@@ -161,15 +161,15 @@ class Trainer:
         if not self.train_config.get('use_scheduler', False):
             return None
 
-        scheduler_type = self.train_config.get('scheduler_type', 'reduce_on_plateau')
+        scheduler_type = self.train_config.get(
+            'scheduler_type', 'reduce_on_plateau')
 
         if scheduler_type == 'reduce_on_plateau':
             scheduler = optim.lr_scheduler.ReduceLROnPlateau(
                 self.optimizer,
                 mode='min',
                 factor=self.train_config.get('scheduler_factor', 0.5),
-                patience=self.train_config.get('scheduler_patience', 10),
-                verbose=True
+                patience=self.train_config.get('scheduler_patience', 10)
             )
         elif scheduler_type == 'step':
             scheduler = optim.lr_scheduler.StepLR(
@@ -317,11 +317,15 @@ class Trainer:
 
             # TensorBoard logging
             if self.tensorboard_logger:
-                self.tensorboard_logger.log_scalar('Loss/train', train_loss, epoch)
+                self.tensorboard_logger.log_scalar(
+                    'Loss/train', train_loss, epoch)
                 self.tensorboard_logger.log_scalar('Loss/val', val_loss, epoch)
-                self.tensorboard_logger.log_scalar('Accuracy/train', train_acc, epoch)
-                self.tensorboard_logger.log_scalar('Accuracy/val', val_acc, epoch)
-                self.tensorboard_logger.log_scalar('Learning_Rate', current_lr, epoch)
+                self.tensorboard_logger.log_scalar(
+                    'Accuracy/train', train_acc, epoch)
+                self.tensorboard_logger.log_scalar(
+                    'Accuracy/val', val_acc, epoch)
+                self.tensorboard_logger.log_scalar(
+                    'Learning_Rate', current_lr, epoch)
 
             # Learning rate scheduling
             if self.lr_scheduler_callback:
@@ -334,7 +338,8 @@ class Trainer:
                 'val_loss': val_loss,
                 'val_acc': val_acc
             }
-            self.checkpoint_callback(epoch, self.model, self.optimizer, val_loss, metrics)
+            self.checkpoint_callback(
+                epoch, self.model, self.optimizer, val_loss, metrics)
 
             # Track best model
             if val_loss < best_val_loss:

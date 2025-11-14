@@ -31,9 +31,6 @@ wandb>=0.15.0  # Optional: for experiment tracking
 requests>=2.31.0
 urllib3>=2.0.0
 
-# Database
-sqlite3  # Built-in with Python
-
 # Development and Testing
 pytest>=7.4.0
 pytest-cov>=4.1.0
