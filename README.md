@@ -88,6 +88,20 @@ This implementation achieves competitive performance with published benchmarks:
 
 The results demonstrate that well-engineered traditional fingerprints with standard neural networks can approach state-of-the-art performance, while being significantly simpler to implement and interpret than graph-based methods.
 
+### Results Visualizations
+
+**Confusion Matrix**
+
+![Confusion Matrix](results/figures/test_confusion_matrix.png)
+
+**ROC Curve**
+
+![ROC Curve](results/figures/test_roc_curve.png)
+
+**Performance Metrics**
+
+![Performance Metrics](results/figures/test_metrics.png)
+
 ## Technical Stack
 
 | Component | Technology |
