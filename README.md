@@ -74,17 +74,28 @@ Dense(2) → Softmax
 
 ### Training Characteristics
 
+<<<<<<< HEAD
 - **Convergence:** 20 epochs (trained to completion)
 - **Training Time:** ~35 minutes (GitHub Codespaces CPU)
 - **Final Loss:** Train 0.089 / Validation 0.515
 - **Best Validation Accuracy:** 88.6% (epoch 11-12)
 - **Learning Rate Decay:** Triggered at epoch 16 (0.001 → 0.0005)
+=======
+- **Convergence:** 50 epochs (Codespaces CPU training)
+- **Training Time:** ~30 minutes (GitHub Codespaces 2-core)
+- **Model Size:** 35,554 parameters (compact architecture)
+- **Feature Dimension:** 518 (512-bit fingerprints + 6 descriptors)
+>>>>>>> 06fc493 (Update performance metrics in README to reflect latest model evaluation results)
 
 ### Comparative Performance
 
 This implementation achieves competitive performance with published benchmarks:
 - **MoleculeNet baseline (2018):** ~88% accuracy
+<<<<<<< HEAD
 - **This implementation:** 85.1% accuracy
+=======
+- **This implementation:** 85.1% accuracy (93.2% precision)
+>>>>>>> 06fc493 (Update performance metrics in README to reflect latest model evaluation results)
 - **Graph neural networks (SOTA):** ~90-92% accuracy
 
 The results demonstrate that well-engineered traditional fingerprints with standard neural networks can approach state-of-the-art performance, while being significantly simpler to implement and interpret than graph-based methods.
