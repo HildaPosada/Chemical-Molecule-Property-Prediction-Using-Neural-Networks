@@ -88,6 +88,24 @@ This implementation achieves competitive performance with published benchmarks:
 
 The results demonstrate that well-engineered traditional fingerprints with standard neural networks can approach state-of-the-art performance, while being significantly simpler to implement and interpret than graph-based methods.
 
+### Model Visualizations
+
+**Confusion Matrix**
+
+![Confusion Matrix](results/figures/test_confusion_matrix.png)
+
+The confusion matrix demonstrates strong true positive (204) and true negative (58) rates, with relatively low false positives (15) and false negatives (31). The high precision (93.2%) indicates the model is particularly effective at minimizing false positives—critical for drug screening applications where false positives lead to wasted experimental resources.
+
+**ROC Curve**
+
+![ROC Curve](results/figures/test_roc_curve.png)
+
+The ROC curve (AUC = 0.90) shows excellent discrimination ability across all classification thresholds, indicating robust model performance independent of threshold selection.
+
+**Performance Metrics**
+
+![Performance Metrics](results/figures/test_metrics.png)
+
 ## Technical Stack
 
 | Component | Technology |
