@@ -3,6 +3,9 @@ NeuroPass - AI-Powered Blood-Brain Barrier Penetration Prediction
 Streamlit Web Interface
 """
 
+from src.utils import load_config
+from src.models import create_model
+from src.data import MoleculePreprocessor
 import os
 import sys
 import streamlit as st
@@ -11,13 +14,11 @@ import pandas as pd
 from PIL import Image
 from io import BytesIO
 import base64
+from copy import deepcopy
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-from src.data import MoleculePreprocessor
-from src.models import create_model
-from src.utils import load_config
 
 # Try to import RDKit
 try:
@@ -93,31 +94,87 @@ st.markdown("""
 def load_model_and_preprocessor():
     """Load the trained model and preprocessor."""
     try:
-        # Load configuration
+        def _get_state_dict(checkpoint_obj):
+            if isinstance(checkpoint_obj, dict) and 'model_state_dict' in checkpoint_obj:
+                return checkpoint_obj['model_state_dict']
+            return checkpoint_obj
+
+        def _feature_dim(cfg):
+            features_cfg = cfg.get('features', {})
+            dim = 0
+            if features_cfg.get('use_morgan_fingerprints', True):
+                dim += int(features_cfg.get('morgan_bits', 1024))
+            if features_cfg.get('use_descriptors', True):
+                dim += len(features_cfg.get('descriptor_list', []))
+            return dim
+
+        def _infer_model_overrides(state_dict):
+            hidden_sizes = []
+            layer_idx = 0
+            while f'layers.{layer_idx}.weight' in state_dict:
+                hidden_sizes.append(
+                    int(state_dict[f'layers.{layer_idx}.weight'].shape[0]))
+                layer_idx += 1
+
+            input_size = int(state_dict['layers.0.weight'].shape[1])
+            num_classes = int(state_dict['output_layer.weight'].shape[0])
+            return {
+                'input_size': input_size,
+                'hidden_sizes': hidden_sizes,
+                'num_classes': num_classes,
+            }
+
+        # Load base configuration and checkpoint
         config = load_config('config/config.yaml')
+        checkpoint_path = 'models/checkpoints/best_model.pth'
+        if not os.path.exists(checkpoint_path):
+            checkpoint_path = 'models/saved_models/final_model.pth'
+
+        device = config['training']['device']
+        checkpoint = torch.load(checkpoint_path, map_location=device)
+        state_dict = _get_state_dict(checkpoint)
+
+        # Prefer checkpoint-embedded config when available.
+        # Otherwise, fall back to a known codespaces config if dimensions don't match.
+        if isinstance(checkpoint, dict) and 'config' in checkpoint and isinstance(checkpoint['config'], dict):
+            config = checkpoint['config']
+            config['training']['device'] = device
+        else:
+            checkpoint_input_size = int(state_dict['layers.0.weight'].shape[1])
+            if _feature_dim(config) != checkpoint_input_size:
+                alt_config_path = 'config/config_codespaces.yaml'
+                if os.path.exists(alt_config_path):
+                    alt_config = load_config(alt_config_path)
+                    if _feature_dim(alt_config) == checkpoint_input_size:
+                        config = alt_config
+
+        # Force model section to match checkpoint architecture
+        overrides = _infer_model_overrides(state_dict)
+        config = deepcopy(config)
+        config['model']['hidden_sizes'] = overrides['hidden_sizes']
+        config['model']['num_classes'] = overrides['num_classes']
 
         # Load preprocessor
         preprocessor = MoleculePreprocessor(config)
-        scaler_path = os.path.join(config['data']['processed_dir'], 'scaler.pkl')
+        scaler_path = os.path.join(
+            config['data']['processed_dir'], 'scaler.pkl')
 
         try:
             preprocessor.load_scaler(scaler_path)
         except FileNotFoundError:
-            st.warning("Scaler not found. Predictions will use non-scaled features.")
+            st.warning(
+                "Scaler not found. Predictions will use non-scaled features.")
 
         # Load model
         input_size = preprocessor.get_feature_dim()
+        if input_size != overrides['input_size']:
+            raise ValueError(
+                f"Feature dimension mismatch: preprocessor={input_size}, checkpoint={overrides['input_size']}. "
+                "Please use the training-time config/checkpoint pair."
+            )
+
         model = create_model(config, input_size)
-
-        device = config['training']['device']
-        model_path = 'models/checkpoints/best_model.pth'
-
-        checkpoint = torch.load(model_path, map_location=device)
-
-        if 'model_state_dict' in checkpoint:
-            model.load_state_dict(checkpoint['model_state_dict'])
-        else:
-            model.load_state_dict(checkpoint)
+        model.load_state_dict(state_dict)
 
         model.to(device)
         model.eval()
@@ -211,8 +268,10 @@ def main():
     """Main Streamlit application."""
 
     # Header
-    st.markdown('<div class="main-header">🧠 NeuroPass</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">AI-Powered Blood-Brain Barrier Penetration Prediction</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">🧠 NeuroPass</div>',
+                unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">AI-Powered Blood-Brain Barrier Penetration Prediction</div>',
+                unsafe_allow_html=True)
 
     # Sidebar
     with st.sidebar:
@@ -241,7 +300,8 @@ def main():
             "Nicotine": "CN1CCCC1C2=CN=CC=C2"
         }
 
-        selected_example = st.selectbox("Select an example:", [""] + list(examples.keys()))
+        selected_example = st.selectbox(
+            "Select an example:", [""] + list(examples.keys()))
 
         if selected_example:
             st.session_state.example_smiles = examples[selected_example]
@@ -268,12 +328,14 @@ def main():
             help="Simplified Molecular Input Line Entry System (SMILES) notation"
         )
 
-        predict_button = st.button("🔬 Predict BBB Penetration", type="primary", use_container_width=True)
+        predict_button = st.button(
+            "🔬 Predict BBB Penetration", type="primary", use_container_width=True)
 
         if predict_button and smiles_input:
             with st.spinner("Analyzing molecule..."):
                 # Make prediction
-                result = predict_molecule(smiles_input, model, preprocessor, device)
+                result = predict_molecule(
+                    smiles_input, model, preprocessor, device)
 
                 if result['valid']:
                     st.session_state.prediction_result = result
@@ -341,7 +403,8 @@ def main():
             properties = get_molecular_properties(smiles_input)
 
             if properties:
-                prop_df = pd.DataFrame(list(properties.items()), columns=['Property', 'Value'])
+                prop_df = pd.DataFrame(list(properties.items()), columns=[
+                                       'Property', 'Value'])
                 st.table(prop_df)
             else:
                 st.info("Molecular properties unavailable")
