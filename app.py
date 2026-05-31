@@ -93,8 +93,8 @@ st.markdown("""
 def load_model_and_preprocessor():
     """Load the trained model and preprocessor."""
     try:
-        # Load configuration
-        config = load_config('config/config.yaml')
+        # Load configuration (use Codespaces config that matches the trained model)
+        config = load_config('config/config_codespaces.yaml')
 
         # Load preprocessor
         preprocessor = MoleculePreprocessor(config)
