@@ -1,5 +1,6 @@
 """
-Streamlit Web Interface for Blood-Brain Barrier Penetration Prediction
+NeuroPass - AI-Powered Blood-Brain Barrier Penetration Prediction
+Streamlit Web Interface
 """
 
 import os
@@ -30,8 +31,8 @@ except ImportError:
 
 # Page configuration
 st.set_page_config(
-    page_title="BBB Penetration Predictor",
-    page_icon="🧬",
+    page_title="NeuroPass - BBB Penetration Predictor",
+    page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -210,8 +211,8 @@ def main():
     """Main Streamlit application."""
 
     # Header
-    st.markdown('<div class="main-header">🧬 Blood-Brain Barrier Penetration Predictor</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">AI-powered molecular property prediction using neural networks</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">🧠 NeuroPass</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">AI-Powered Blood-Brain Barrier Penetration Prediction</div>', unsafe_allow_html=True)
 
     # Sidebar
     with st.sidebar:
@@ -368,7 +369,7 @@ def main():
     # Footer
     st.markdown("---")
     st.markdown(
-        '<div style="text-align: center; color: #666;">Built with PyTorch, RDKit, and Streamlit | '
+        '<div style="text-align: center; color: #666;"><strong>NeuroPass</strong> - Built with PyTorch, RDKit, and Streamlit | '
         'Chemistry + AI Integration</div>',
         unsafe_allow_html=True
     )

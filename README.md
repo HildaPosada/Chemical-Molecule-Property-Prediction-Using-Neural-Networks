@@ -16,6 +16,19 @@
 | **Tech Stack** | PyTorch, RDKit, Scikit-learn, TensorBoard |
 | **Impact** | Reduces expensive laboratory screening; demonstrates ML + chemistry integration |
 
+## 🧠 NeuroPass: Interactive Web Demo
+
+Try the live demo: **[Launch NeuroPass](app.py)** (run locally with `streamlit run app.py`)
+
+NeuroPass provides an intuitive interface for predicting BBB penetration:
+- 🔬 **Real-time predictions** from SMILES input
+- 📊 **Confidence scores** and probability breakdown
+- 🧬 **Molecular visualization** with 2D structure rendering
+- 📈 **Physicochemical properties** (MW, LogP, H-bonds, TPSA)
+- 💡 **Example molecules** for quick testing
+
+Perfect for pharmaceutical researchers, medicinal chemists, and drug discovery teams.
+
 ## Why This Matters
 
 Blood-brain barrier (BBB) penetration prediction accelerates neurological drug development by:
