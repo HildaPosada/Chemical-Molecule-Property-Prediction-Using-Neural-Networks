@@ -3,7 +3,7 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://neuropass.streamlit.app/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://neuropass.streamlit.app/)
 
 > **A production-grade deep learning system for predicting blood-brain barrier penetration from molecular structure. Achieved 85.1% accuracy with 93.2% precision on the MoleculeNet BBBP benchmark.**
 
@@ -19,9 +19,12 @@
 
 ## 🧠 NeuroPass: Interactive Web Demo
 
-**🌐 [Try NeuroPass Live →](https://neuropass.streamlit.app/)**
+**Run NeuroPass locally:**
+```bash
+streamlit run app.py
+```
 
-Experience real-time BBB penetration prediction in your browser - no installation required!
+Or deploy to Streamlit Cloud for public access (see [WEB_APP_GUIDE.md](WEB_APP_GUIDE.md) for deployment instructions).
 
 NeuroPass provides an intuitive interface for predicting BBB penetration:
 - 🔬 **Real-time predictions** from SMILES input
