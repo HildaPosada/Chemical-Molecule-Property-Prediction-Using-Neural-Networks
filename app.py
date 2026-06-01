@@ -19,15 +19,20 @@ from copy import deepcopy
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
+APP_BUILD = "2026-06-01"
 
-# Try to import RDKit
+
+# Try to import RDKit chemistry modules.
+# Drawing modules are imported lazily because they can be unavailable in some
+# deployments even when core RDKit chemistry support is installed.
+RDKIT_CHEM_AVAILABLE = False
+
 try:
     from rdkit import Chem
-    from rdkit.Chem import Draw, Descriptors
-    RDKIT_AVAILABLE = True
+    from rdkit.Chem import Descriptors
+    RDKIT_CHEM_AVAILABLE = True
 except ImportError:
-    RDKIT_AVAILABLE = False
-    st.warning("RDKit not available. Molecular visualization will be disabled.")
+    RDKIT_CHEM_AVAILABLE = False
 
 
 # Page configuration
@@ -94,6 +99,11 @@ st.markdown("""
 def load_model_and_preprocessor():
     """Load the trained model and preprocessor."""
     try:
+        if not RDKIT_CHEM_AVAILABLE:
+            raise ImportError(
+                "RDKit chemistry modules are not available. Install RDKit to enable prediction."
+            )
+
         def _get_state_dict(checkpoint_obj):
             if isinstance(checkpoint_obj, dict) and 'model_state_dict' in checkpoint_obj:
                 return checkpoint_obj['model_state_dict']
@@ -225,24 +235,24 @@ def predict_molecule(smiles: str, model, preprocessor, device):
 
 def draw_molecule(smiles: str):
     """Draw molecule structure from SMILES."""
-    if not RDKIT_AVAILABLE:
+    if not RDKIT_CHEM_AVAILABLE:
         return None
 
     try:
+        from rdkit.Chem import Draw
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
             return None
 
         img = Draw.MolToImage(mol, size=(400, 400))
         return img
-    except Exception as e:
-        st.error(f"Error drawing molecule: {str(e)}")
+    except Exception:
         return None
 
 
 def get_molecular_properties(smiles: str):
     """Calculate basic molecular properties."""
-    if not RDKIT_AVAILABLE:
+    if not RDKIT_CHEM_AVAILABLE:
         return {}
 
     try:
@@ -257,7 +267,7 @@ def get_molecular_properties(smiles: str):
             'H-Bond Acceptors': Descriptors.NumHAcceptors(mol),
             'Rotatable Bonds': Descriptors.NumRotatableBonds(mol),
             'Aromatic Rings': Descriptors.NumAromaticRings(mol),
-            'TPSA': f"{Descriptors.TPSA(mol):.2f} Ų"
+            'TPSA': f"{Descriptors.TPSA(mol):.2f} A^2"
         }
         return properties
     except Exception as e:
@@ -266,6 +276,12 @@ def get_molecular_properties(smiles: str):
 
 def main():
     """Main Streamlit application."""
+
+    if not RDKIT_CHEM_AVAILABLE:
+        st.error(
+            "RDKit is not available in this environment. Prediction and molecular analysis require RDKit."
+        )
+        st.stop()
 
     # Header
     st.markdown('<div class="main-header">🧠 NeuroPass</div>',
@@ -276,6 +292,7 @@ def main():
     # Sidebar
     with st.sidebar:
         st.header("About")
+        st.caption(f"Build: {APP_BUILD}")
         st.markdown("""
         This application predicts whether a drug molecule can cross the **Blood-Brain Barrier (BBB)**
         using a neural network trained on molecular fingerprints and physicochemical descriptors.
@@ -351,7 +368,8 @@ def main():
             if img:
                 st.image(img, use_container_width=True)
             else:
-                st.info("Molecular visualization unavailable")
+                st.info(
+                    "Molecular visualization unavailable (drawing backend not available)")
 
     with col2:
         st.subheader("Prediction Results")
