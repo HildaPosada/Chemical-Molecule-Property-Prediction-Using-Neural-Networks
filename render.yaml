@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: neuropass-api
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: "pip install -r api/requirements.txt"
+    startCommand: "cd api && python main.py"
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: CONFIG_PATH
+        value: ../config/config_codespaces.yaml
+      - key: MODEL_PATH
+        value: ../models/checkpoints/best_model.pth
+      - key: PYTHON_VERSION
+        value: 3.9.18
