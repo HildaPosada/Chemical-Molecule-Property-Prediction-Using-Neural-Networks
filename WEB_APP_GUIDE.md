@@ -47,13 +47,56 @@
 - Both support Streamlit deployments
 - Follow their respective documentation
 
+## FastAPI Backend for Frontend Integration
+
+If your frontend expects an API URL (for example `VITE_PREDICT_API_URL`), use the FastAPI backend in this repository.
+
+### Run FastAPI locally
+
+```bash
+uvicorn api.main:app --host 0.0.0.0 --port 8000
+```
+
+Endpoints:
+- `GET /health`
+- `POST /predict` with JSON body: `{"smiles": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C"}`
+
+Swagger docs:
+- `http://localhost:8000/docs`
+
+### Deploy backend on Render (free tier)
+
+1. Create a new Web Service from your GitHub repository.
+2. Set Build Command:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Set Start Command:
+   ```bash
+   uvicorn api.main:app --host 0.0.0.0 --port $PORT
+   ```
+4. Optional environment variables:
+   - `ALLOWED_ORIGINS=https://your-frontend-domain.com`
+   - `CONFIG_PATH=config/config.yaml`
+   - `MODEL_CHECKPOINT_PATH=models/checkpoints/best_model.pth`
+
+### Set Vite environment variable
+
+In your Vite frontend project:
+
+```bash
+VITE_PREDICT_API_URL=https://your-backend.onrender.com
+```
+
+Redeploy/restart your frontend after changing env vars.
+
 ## Features
 
-✨ **Interactive molecule input** - Enter SMILES strings or select examples  
-🔬 **Real-time predictions** - Instant BBB penetration predictions  
-📊 **Confidence scores** - See model confidence and probability breakdown  
-🧬 **Molecular visualization** - View 2D structure of input molecules  
-📈 **Molecular properties** - Calculate key physicochemical descriptors  
+✨ **Interactive molecule input** - Enter SMILES strings or select examples
+🔬 **Real-time predictions** - Instant BBB penetration predictions
+📊 **Confidence scores** - See model confidence and probability breakdown
+🧬 **Molecular visualization** - View 2D structure of input molecules
+📈 **Molecular properties** - Calculate key physicochemical descriptors
 
 ## Usage Tips
 
