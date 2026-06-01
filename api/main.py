@@ -27,6 +27,8 @@ class PredictResponse(BaseModel):
     """Response payload for single-molecule prediction."""
 
     smiles: str
+    classification: str
+    probability: float
     prediction: int
     prediction_label: str
     confidence: float
@@ -168,13 +170,16 @@ def predict_single(smiles: str) -> PredictResponse:
         prediction = torch.argmax(probabilities, dim=1)
 
     pred_idx = int(prediction.item())
+    prob_positive = float(probabilities[0, 1].item())
     return PredictResponse(
         smiles=smiles,
+        classification="BBB+" if pred_idx == 1 else "BBB-",
+        probability=prob_positive,
         prediction=pred_idx,
         prediction_label="Penetrates BBB" if pred_idx == 1 else "Does not penetrate BBB",
         confidence=float(probabilities[0, pred_idx].item()),
         probability_negative=float(probabilities[0, 0].item()),
-        probability_positive=float(probabilities[0, 1].item()),
+        probability_positive=prob_positive,
     )
 
 
