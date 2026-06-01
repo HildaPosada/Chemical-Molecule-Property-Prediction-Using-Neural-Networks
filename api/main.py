@@ -3,7 +3,7 @@
 import os
 from copy import deepcopy
 from functools import lru_cache
-from typing import List
+from typing import Dict, List
 
 import torch
 from fastapi import FastAPI, HTTPException
@@ -23,17 +23,33 @@ class PredictRequest(BaseModel):
     smiles: str = Field(..., min_length=1, description="Input SMILES string")
 
 
+class BatchPredictRequest(BaseModel):
+    """Request payload for batch prediction."""
+
+    smiles_list: List[str] = Field(..., min_length=1,
+                                   description="List of SMILES strings")
+
+
 class PredictResponse(BaseModel):
     """Response payload for single-molecule prediction."""
 
     smiles: str
     classification: str
     probability: float
+    confidence_band: str
     prediction: int
     prediction_label: str
     confidence: float
     probability_negative: float
     probability_positive: float
+    molecular_properties: Dict[str, float]
+
+
+class BatchPredictResponse(BaseModel):
+    """Response payload for batch prediction."""
+
+    count: int
+    results: List[PredictResponse]
 
 
 class HealthResponse(BaseModel):
@@ -49,6 +65,34 @@ def _parse_allowed_origins() -> List[str]:
     if raw == "*":
         return ["*"]
     return [origin.strip() for origin in raw.split(",") if origin.strip()]
+
+
+def _confidence_band(probability: float) -> str:
+    """Map model confidence to a human-readable confidence band."""
+    if probability >= 0.85:
+        return "high"
+    if probability >= 0.65:
+        return "medium"
+    return "low"
+
+
+def _compute_molecular_properties(smiles: str) -> Dict[str, float]:
+    """Compute basic physicochemical properties for explainability."""
+    from rdkit import Chem
+    from rdkit.Chem import Descriptors
+
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return {}
+
+    return {
+        "molecular_weight": float(Descriptors.MolWt(mol)),
+        "logp": float(Descriptors.MolLogP(mol)),
+        "hbond_donors": float(Descriptors.NumHDonors(mol)),
+        "hbond_acceptors": float(Descriptors.NumHAcceptors(mol)),
+        "tpsa": float(Descriptors.TPSA(mol)),
+        "rotatable_bonds": float(Descriptors.NumRotatableBonds(mol)),
+    }
 
 
 def _get_state_dict(checkpoint_obj):
@@ -171,15 +215,20 @@ def predict_single(smiles: str) -> PredictResponse:
 
     pred_idx = int(prediction.item())
     prob_positive = float(probabilities[0, 1].item())
+    prob_predicted = float(probabilities[0, pred_idx].item())
+    molecular_properties = _compute_molecular_properties(smiles)
+
     return PredictResponse(
         smiles=smiles,
         classification="BBB+" if pred_idx == 1 else "BBB-",
         probability=prob_positive,
+        confidence_band=_confidence_band(prob_predicted),
         prediction=pred_idx,
         prediction_label="Penetrates BBB" if pred_idx == 1 else "Does not penetrate BBB",
-        confidence=float(probabilities[0, pred_idx].item()),
+        confidence=prob_predicted,
         probability_negative=float(probabilities[0, 0].item()),
         probability_positive=prob_positive,
+        molecular_properties=molecular_properties,
     )
 
 
@@ -220,3 +269,30 @@ def predict(payload: PredictRequest) -> PredictResponse:
     except Exception as exc:
         raise HTTPException(
             status_code=500, detail=f"Prediction failed: {exc}") from exc
+
+
+@app.post("/v1/predict", response_model=PredictResponse)
+def predict_v1(payload: PredictRequest) -> PredictResponse:
+    """Versioned prediction endpoint for stable frontend integration."""
+    return predict(payload)
+
+
+@app.post("/v1/predict-batch", response_model=BatchPredictResponse)
+def predict_batch_v1(payload: BatchPredictRequest) -> BatchPredictResponse:
+    """Batch prediction endpoint for screening multiple molecules."""
+    if len(payload.smiles_list) > 200:
+        raise HTTPException(
+            status_code=400,
+            detail="Batch size too large. Maximum allowed is 200 molecules per request.",
+        )
+
+    results: List[PredictResponse] = []
+    for smiles in payload.smiles_list:
+        try:
+            results.append(predict_single(smiles))
+        except HTTPException:
+            # Skip invalid entries in batch mode to keep the endpoint useful for
+            # large screens; users can inspect successful predictions immediately.
+            continue
+
+    return BatchPredictResponse(count=len(results), results=results)

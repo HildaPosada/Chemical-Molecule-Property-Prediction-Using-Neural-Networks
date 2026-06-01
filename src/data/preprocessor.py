@@ -38,7 +38,8 @@ class MoleculePreprocessor:
         self.feature_config = config['features']
 
         # Feature extraction settings
-        self.use_morgan = self.feature_config.get('use_morgan_fingerprints', True)
+        self.use_morgan = self.feature_config.get(
+            'use_morgan_fingerprints', True)
         self.morgan_radius = self.feature_config.get('morgan_radius', 2)
         self.morgan_bits = self.feature_config.get('morgan_bits', 1024)
 
@@ -60,6 +61,20 @@ class MoleculePreprocessor:
 
         self.feature_names = []
         self.is_fitted = False
+
+        # Common alias support so config names remain user-friendly while still
+        # resolving to canonical RDKit descriptor names.
+        self.descriptor_aliases = {
+            'LogP': 'MolLogP',
+            'MW': 'MolWt',
+            'MolecularWeight': 'MolWt',
+            'HBD': 'NumHDonors',
+            'HBA': 'NumHAcceptors',
+        }
+
+    def _resolve_descriptor_name(self, desc_name: str) -> str:
+        """Resolve descriptor aliases to canonical RDKit descriptor names."""
+        return self.descriptor_aliases.get(desc_name, desc_name)
 
     def smiles_to_mol(self, smiles: str) -> Optional[Chem.Mol]:
         """
@@ -108,16 +123,20 @@ class MoleculePreprocessor:
         descriptor_values = []
 
         for desc_name in self.descriptor_list:
+            resolved_name = self._resolve_descriptor_name(desc_name)
             try:
-                if hasattr(Descriptors, desc_name):
-                    desc_func = getattr(Descriptors, desc_name)
+                if hasattr(Descriptors, resolved_name):
+                    desc_func = getattr(Descriptors, resolved_name)
                     value = desc_func(mol)
                     descriptor_values.append(value)
                 else:
-                    logger.warning(f"Descriptor '{desc_name}' not found in RDKit")
+                    logger.warning(
+                        f"Descriptor '{desc_name}' (resolved to '{resolved_name}') not found in RDKit"
+                    )
                     descriptor_values.append(0.0)
             except Exception as e:
-                logger.warning(f"Error calculating descriptor '{desc_name}': {e}")
+                logger.warning(
+                    f"Error calculating descriptor '{desc_name}': {e}")
                 descriptor_values.append(0.0)
 
         return np.array(descriptor_values)
@@ -185,7 +204,8 @@ class MoleculePreprocessor:
                 labels_list.append(label)
                 valid_indices.append(idx)
             else:
-                logger.warning(f"Failed to extract features for SMILES: {smiles}")
+                logger.warning(
+                    f"Failed to extract features for SMILES: {smiles}")
 
         if not features_list:
             raise ValueError("No valid features extracted from dataset")
@@ -209,7 +229,8 @@ class MoleculePreprocessor:
                 self.is_fitted = True
             else:
                 if not self.is_fitted:
-                    raise ValueError("Scaler not fitted. Process training data first.")
+                    raise ValueError(
+                        "Scaler not fitted. Process training data first.")
                 X = self.scaler.transform(X)
 
         return X, y, valid_indices
@@ -226,7 +247,8 @@ class MoleculePreprocessor:
 
         # Validate
         if len(names) != num_features:
-            logger.warning(f"Feature name count mismatch. Expected {num_features}, got {len(names)}")
+            logger.warning(
+                f"Feature name count mismatch. Expected {num_features}, got {len(names)}")
             names = [f'feature_{i}' for i in range(num_features)]
 
         self.feature_names = names

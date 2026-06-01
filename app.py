@@ -227,11 +227,21 @@ def predict_molecule(smiles: str, model, preprocessor, device):
         probabilities = torch.softmax(outputs, dim=1)
         prediction = torch.argmax(probabilities, dim=1)
 
+    predicted_idx = int(prediction.item())
+    predicted_confidence = float(probabilities[0, predicted_idx].item())
+    if predicted_confidence >= 0.85:
+        confidence_band = 'High confidence'
+    elif predicted_confidence >= 0.65:
+        confidence_band = 'Medium confidence'
+    else:
+        confidence_band = 'Low confidence'
+
     return {
         'valid': True,
-        'prediction': int(prediction.item()),
-        'prediction_label': 'Penetrates BBB' if prediction.item() == 1 else 'Does not penetrate BBB',
-        'confidence': float(probabilities[0, prediction.item()].item()),
+        'prediction': predicted_idx,
+        'prediction_label': 'Penetrates BBB' if predicted_idx == 1 else 'Does not penetrate BBB',
+        'confidence': predicted_confidence,
+        'confidence_band': confidence_band,
         'probability_negative': float(probabilities[0, 0].item()),
         'probability_positive': float(probabilities[0, 1].item())
     }
@@ -403,6 +413,7 @@ def main():
                     f"{result['confidence']:.1%}",
                     help="Confidence in the predicted class"
                 )
+                st.caption(result.get('confidence_band', ''))
 
             with col_b:
                 st.metric(
