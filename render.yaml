@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: neuropass-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    autoDeploy: true
+    envVars:
+      - key: CONFIG_PATH
+        value: config/config.yaml
+      - key: MODEL_CHECKPOINT_PATH
+        value: models/checkpoints/best_model.pth
+      - key: ALLOWED_ORIGINS
+        value: "*"
