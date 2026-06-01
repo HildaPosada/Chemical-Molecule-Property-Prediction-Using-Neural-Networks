@@ -213,6 +213,10 @@ def predict_molecule(smiles: str, model, preprocessor, device):
             'error': 'Feature extraction failed'
         }
 
+    # Apply training-time feature scaling if scaler is available
+    if preprocessor.scale_features and preprocessor.is_fitted:
+        features = preprocessor.scaler.transform(features.reshape(1, -1))[0]
+
     # Convert to tensor
     features_tensor = torch.FloatTensor(features).unsqueeze(0).to(device)
 

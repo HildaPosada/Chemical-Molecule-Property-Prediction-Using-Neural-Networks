@@ -1,5 +1,8 @@
 """Script for making predictions on new molecules."""
 
+from src.utils import load_config, setup_logger
+from src.models import create_model
+from src.data import MoleculePreprocessor
 import os
 import sys
 import argparse
@@ -7,11 +10,9 @@ import torch
 import pandas as pd
 
 # Add parent directory to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '..')))
 
-from src.data import MoleculePreprocessor
-from src.models import create_model
-from src.utils import load_config, setup_logger
 
 logger = setup_logger()
 
@@ -51,6 +52,10 @@ def predict_from_smiles(
             'error': 'Feature extraction failed'
         }
 
+    # Apply training-time feature scaling if scaler is available
+    if preprocessor.scale_features and preprocessor.is_fitted:
+        features = preprocessor.scaler.transform(features.reshape(1, -1))[0]
+
     # Convert to tensor
     features_tensor = torch.FloatTensor(features).unsqueeze(0).to(device)
 
@@ -74,7 +79,8 @@ def predict_from_smiles(
 
 def main():
     """Make predictions on new molecules."""
-    parser = argparse.ArgumentParser(description='Predict molecular properties')
+    parser = argparse.ArgumentParser(
+        description='Predict molecular properties')
     parser.add_argument(
         '--model-path',
         type=str,
@@ -121,7 +127,8 @@ def main():
     try:
         preprocessor.load_scaler(scaler_path)
     except FileNotFoundError:
-        logger.warning(f"Scaler not found at {scaler_path}. Features will not be scaled.")
+        logger.warning(
+            f"Scaler not found at {scaler_path}. Features will not be scaled.")
 
     # Load model
     logger.info("Loading model...")
@@ -153,8 +160,10 @@ def main():
         if result['valid']:
             logger.info(f"Prediction: {result['prediction_label']}")
             logger.info(f"Confidence: {result['confidence']:.2%}")
-            logger.info(f"Probability (No): {result['probability_negative']:.2%}")
-            logger.info(f"Probability (Yes): {result['probability_positive']:.2%}")
+            logger.info(
+                f"Probability (No): {result['probability_negative']:.2%}")
+            logger.info(
+                f"Probability (Yes): {result['probability_positive']:.2%}")
         else:
             logger.error(f"Error: {result['error']}")
 
@@ -191,7 +200,8 @@ def main():
             logger.info(f"Total molecules: {len(results_df)}")
             logger.info(f"Valid predictions: {len(valid_predictions)}")
             logger.info(f"Penetrates BBB: {positive_count}")
-            logger.info(f"Does not penetrate BBB: {len(valid_predictions) - positive_count}")
+            logger.info(
+                f"Does not penetrate BBB: {len(valid_predictions) - positive_count}")
 
     logger.info("\nPrediction complete!")
 
