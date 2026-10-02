@@ -4,7 +4,7 @@
 
 The [web demo](https://molecule-demo.vercel.app/) illustrates descriptor rules for six examples. It is not connected to the repository's trained PyTorch model. Arbitrary SMILES are rejected rather than assigned invented predictions. The model backend still needs deployment and end-to-end evaluation.
 
-See [deployment source and scope](web/README.md) and the [portfolio audit](https://github.com/HildaPosada/hildaposada.github.io/blob/main/docs/project_audit.md). Historical descriptions below are not evidence of a connected production backend.
+See [deployment source and scope](web/README.md) and the [portfolio audit](https://github.com/HildaPosada/hildaposada.github.io/blob/master/docs/project_audit.md). Historical descriptions below are not evidence of a connected production backend.
 
 
 > **[Live Demo](https://molecule-demo.vercel.app)** | NeuroPass BBB Predictor Demo
