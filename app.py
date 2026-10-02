@@ -19,7 +19,7 @@ from copy import deepcopy
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-APP_BUILD = "2026-10-01-svg"
+APP_BUILD = "2026-10-01-comparison"
 
 
 # Try to import RDKit chemistry modules.
@@ -449,6 +449,61 @@ def main():
 
         else:
             st.info("👈 Enter a SMILES string and click 'Predict' to see results")
+
+
+    st.markdown("---")
+    st.subheader("Compare molecules")
+    st.caption("Run the same trained model across a shortlist. Scores are model estimates, not measured permeability.")
+    threshold = st.slider("BBB-positive decision threshold", 0.05, 0.95, 0.50, 0.05)
+    batch_text = st.text_area("One SMILES per line", value="CC(=O)OC1=CC=CC=C1C(=O)O\nCN1CCCC1C2=CN=CC=C2", height=120)
+    upload = st.file_uploader("Or upload a CSV with a smiles column (optional name column)", type=["csv"])
+    source = pd.DataFrame({"smiles": batch_text.splitlines()})
+    if upload is not None:
+        try:
+            source = pd.read_csv(upload, dtype=str).fillna("")
+            if "smiles" not in source.columns:
+                st.error("The CSV needs a column named smiles.")
+                source = pd.DataFrame(columns=["smiles"])
+        except Exception:
+            st.error("The CSV could not be read.")
+            source = pd.DataFrame(columns=["smiles"])
+    if st.button("Compare shortlist", type="primary"):
+        if len(source) > 200:
+            st.error("Upload at most 200 molecules per batch.")
+        else:
+            rows = []
+            with st.spinner("Scoring shortlist..."):
+                for index, row in source.iterrows():
+                    smi = str(row["smiles"]).strip()
+                    if not smi:
+                        continue
+                    record = {"Name": str(row.get("name", "")) or f"Molecule {index + 1}", "SMILES": smi}
+                    try:
+                        prediction = predict_molecule(smi, model, preprocessor, device)
+                        if not prediction["valid"]:
+                            record["Status"] = prediction["error"]
+                        else:
+                            record.update({"Status": "Scored", "BBB-positive score": prediction["probability_positive"]})
+                            mol = Chem.MolFromSmiles(smi)
+                            record.update({"MW (g/mol)": Descriptors.MolWt(mol), "LogP": Descriptors.MolLogP(mol),
+                                           "TPSA (Å²)": Descriptors.TPSA(mol),
+                                           "H-bond donors": Descriptors.NumHDonors(mol),
+                                           "H-bond acceptors": Descriptors.NumHAcceptors(mol)})
+                    except Exception:
+                        record["Status"] = "Unable to score this molecule"
+                    rows.append(record)
+            st.session_state.shortlist = rows
+    if st.session_state.get("shortlist"):
+        comparison = pd.DataFrame(st.session_state.shortlist)
+        if "BBB-positive score" in comparison:
+            comparison["Decision"] = comparison["BBB-positive score"].apply(
+                lambda score: "Invalid input" if pd.isna(score) else ("BBB+" if score >= threshold else "BBB−"))
+            scored = comparison.dropna(subset=["BBB-positive score"])
+            st.bar_chart(scored.set_index("Name")["BBB-positive score"])
+            st.caption(f"Decision threshold: {threshold:.0%}. Moving the threshold changes decisions, not model scores.")
+        st.dataframe(comparison, use_container_width=True, hide_index=True)
+        st.download_button("Download comparison CSV", comparison.to_csv(index=False).encode("utf-8"),
+                           "neuropass-comparison.csv", "text/csv")
 
     # Information section
     st.markdown("---")
