@@ -1,5 +1,13 @@
 # Molecular Property Prediction with Deep Learning
 
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![RDKit](https://img.shields.io/badge/RDKit-00A67D?style=for-the-badge&logoColor=white)](https://www.rdkit.org/)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+
+
 ## Verified deployment status · October 1, 2026
 
 The primary [NeuroPass app](https://neuropass.streamlit.app/) runs the trained PyTorch model with RDKit molecular features. Verified aspirin and nicotine predictions (57.5% and 92.1% BBB-positive probability respectively) and invalid-SMILES rejection. Molecular structures now render as SVG with the required Linux drawing libraries declared in `packages.txt`. Verified the structure image and prediction together after deployment. These smoke tests verify the inference flow, not overall prediction accuracy. The [older web demonstration](https://molecule-demo.vercel.app/) remains available as a clearly labeled six-example rule demo, separate from the trained model.
@@ -9,8 +17,6 @@ See [deployment source and scope](web/README.md) and the [portfolio audit](https
 > **[Live App](https://neuropass.streamlit.app/)** | NeuroPass BBB Predictor
 
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > **A production-grade deep learning system for predicting blood-brain barrier penetration from molecular structure. Achieved 85.1% accuracy with 93.2% precision on the MoleculeNet BBBP benchmark.**
