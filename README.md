@@ -2,12 +2,11 @@
 
 ## Verified deployment status · October 1, 2026
 
-The [web demo](https://molecule-demo.vercel.app/) illustrates descriptor rules for six examples. It is not connected to the repository's trained PyTorch model. Arbitrary SMILES are rejected rather than assigned invented predictions. The model backend still needs deployment and end-to-end evaluation.
-
+The primary [NeuroPass app](https://neuropass.streamlit.app/) runs the trained PyTorch model with RDKit molecular features. Verified aspirin and nicotine predictions (57.5% and 92.1% BBB-positive probability respectively) and invalid-SMILES rejection. These smoke tests verify the inference flow, not overall prediction accuracy. The [older web demonstration](https://molecule-demo.vercel.app/) remains available as a clearly labeled six-example rule demo, separate from the trained model.
 See [deployment source and scope](web/README.md) and the [portfolio audit](https://github.com/HildaPosada/hildaposada.github.io/blob/master/docs/project_audit.md). Historical descriptions below are not evidence of a connected production backend.
 
 
-> **[Live Demo](https://molecule-demo.vercel.app)** | NeuroPass BBB Predictor Demo
+> **[Live App](https://neuropass.streamlit.app/)** | NeuroPass BBB Predictor
 
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
