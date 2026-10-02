@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NeuroPass · Blood-Brain Barrier Predictor</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#e8e6e3;font-family:system-ui,sans-serif;min-height:100vh}
+.topbar{background:#141414;border-bottom:1px solid #242424;padding:1rem 2rem;display:flex;align-items:center;gap:1rem}
+.topbar h1{font-size:1.1rem;font-weight:700}
+.badge{background:#00c89620;color:#00c896;border:1px solid #00c896;padding:.2rem .7rem;border-radius:999px;font-size:.7rem;font-weight:700}
+.main{max-width:1000px;margin:2rem auto;padding:0 1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.panel{background:#141414;border:1px solid #242424;border-radius:.75rem;padding:1.5rem}
+.panel h2{font-size:.75rem;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1.25rem}
+label{display:block;font-size:.75rem;color:#888;margin-bottom:.3rem;font-weight:600;margin-top:.75rem}
+input,select{width:100%;background:#1a1a1a;border:1px solid #333;color:#e8e6e3;padding:.5rem .75rem;border-radius:.4rem;font-size:.875rem}
+input:focus,select:focus{outline:2px solid #00c896}
+.smiles-examples{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
+.smiles-btn{background:#1a1a1a;border:1px solid #333;color:#888;padding:.25rem .6rem;border-radius:.35rem;font-size:.7rem;cursor:pointer;font-family:monospace;transition:all .15s}
+.smiles-btn:hover{border-color:#00c896;color:#00c896}
+.btn{width:100%;margin-top:1.25rem;padding:.8rem;background:#00c896;color:#0d0d0d;font-weight:800;border:none;border-radius:.5rem;cursor:pointer;font-size:.9rem}
+.result-card{margin-top:1.25rem;padding:1.25rem;border-radius:.5rem;display:none}
+.result-card.show{display:block}
+.bbb-yes{background:#00c89615;border:1px solid #00c89640}
+.bbb-no{background:#f43f5e15;border:1px solid #f43f5e40}
+.verdict{font-size:1.5rem;font-weight:800;margin-bottom:.35rem}
+.verdict.yes{color:#00c896}.verdict.no{color:#f43f5e}
+.prob-bar-wrap{margin-top:1rem}
+.prob-label{font-size:.75rem;color:#888;display:flex;justify-content:space-between;margin-bottom:.25rem}
+.prob-track{background:#1a1a1a;border-radius:4px;height:10px}
+.prob-fill{height:10px;border-radius:4px;transition:width .6s ease}
+.fill-yes{background:linear-gradient(90deg,#00c896,#00b085)}
+.fill-no{background:linear-gradient(90deg,#f43f5e,#e11d48)}
+.prop-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:1rem}
+.prop{background:#0d0d0d;border-radius:.4rem;padding:.5rem .75rem}
+.prop-name{font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.05em}
+.prop-val{font-size:.9rem;font-weight:700;margin-top:.1rem}
+.known-table{width:100%;border-collapse:collapse;margin-top:.5rem}
+.known-table th{font-size:.65rem;color:#555;text-align:left;padding:.3rem .4rem;border-bottom:1px solid #1a1a1a;text-transform:uppercase}
+.known-table td{font-size:.75rem;padding:.4rem;border-bottom:1px solid #1a1a1a;font-family:monospace}
+.known-table .y{color:#00c896;font-weight:700}.known-table .n{color:#f43f5e;font-weight:700}
+@media(max-width:600px){.main{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div style="font-size:1.25rem">🧬</div>
+  <h1>NeuroPass · BBB Predictor</h1>
+  <div class="badge">Rule demonstration</div>
+  <div style="margin-left:auto;font-size:.75rem;color:#555">Built by <a href="https://hildaposada.github.io" style="color:#00c896;text-decoration:none">Hilda Posada</a></div>
+</div>
+<div class="main">
+  <div>
+    <div class="panel">
+      <h2>Molecule Input</h2><p style="font-size:.8rem;color:#aaa;margin-bottom:1rem">This page demonstrates hand-written descriptor rules for six preset examples. The trained PyTorch model in the repository is not connected here.</p>
+      <label>SMILES String</label>
+      <input type="text" id="smiles" value="CC(=O)Oc1ccccc1C(=O)O" placeholder="Enter SMILES notation..."/>
+      <div style="font-size:.7rem;color:#555;margin-top:.35rem">Standard molecular SMILES notation</div>
+      <div style="font-size:.7rem;color:#888;margin-top:.75rem;margin-bottom:.4rem">Quick examples:</div>
+      <div class="smiles-examples">
+        <div class="smiles-btn" onclick="setSMILES(this,'CC(=O)Oc1ccccc1C(=O)O')">Aspirin</div>
+        <div class="smiles-btn" onclick="setSMILES(this,'CN1CCC[C@H]1c2cccnc2')">Nicotine</div>
+        <div class="smiles-btn" onclick="setSMILES(this,'CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C')">Testosterone</div>
+        <div class="smiles-btn" onclick="setSMILES(this,'OC(=O)c1ccc(N)cc1')">PABA</div>
+        <div class="smiles-btn" onclick="setSMILES(this,'c1ccc2c(c1)cc1ccc3cccc4ccc2c1c34')">Pyrene</div>
+        <div class="smiles-btn" onclick="setSMILES(this,'CC(C)Cc1ccc(cc1)C(C)C(=O)O')">Ibuprofen</div>
+      </div>
+      <label style="margin-top:1.25rem">Molecular Weight (g/mol)</label>
+      <input type="number" id="mw" value="180.16" step="0.1"/>
+      <label>LogP (lipophilicity)</label>
+      <input type="number" id="logp" value="1.19" step="0.01"/>
+      <label>H-Bond Donors</label>
+      <input type="number" id="hbd" value="1" min="0" max="20"/>
+      <label>H-Bond Acceptors</label>
+      <input type="number" id="hba" value="4" min="0" max="20"/>
+      <button class="btn" onclick="predict()">Explore descriptor rules →</button>
+    </div>
+  </div>
+  <div>
+    <div class="panel">
+      <h2>Prediction Result</h2>
+      <div id="placeholder" style="color:#555;font-size:.875rem;padding:2rem 0">Enter a SMILES string and click Predict to check blood-brain barrier permeability.</div>
+      <div class="result-card" id="resultCard">
+        <div class="verdict" id="verdict"></div>
+        <div id="verdict-sub" style="font-size:.8rem;color:#888;margin-bottom:.5rem"></div>
+        <div class="prob-bar-wrap">
+          <div class="prob-label"><span>Illustrative rule score</span><span id="probVal" style="color:#00c896"></span></div>
+          <div class="prob-track"><div class="prob-fill fill-yes" id="probBar" style="width:0%"></div></div>
+        </div>
+        <div class="prop-grid" id="propGrid"></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:1.25rem">
+      <h2>Illustrative examples</h2>
+      <table class="known-table">
+        <thead><tr><th>Molecule</th><th>MW</th><th>LogP</th><th>BBB</th></tr></thead>
+        <tbody>
+          <tr><td>Caffeine</td><td>194</td><td>-0.07</td><td class="y">BBB+</td></tr>
+          <tr><td>Aspirin</td><td>180</td><td>1.19</td><td class="y">BBB+</td></tr>
+          <tr><td>Nicotine</td><td>162</td><td>1.17</td><td class="y">BBB+</td></tr>
+          <tr><td>Glucose</td><td>180</td><td>-3.24</td><td class="n">BBB-</td></tr>
+          <tr><td>Penicillin G</td><td>334</td><td>1.83</td><td class="n">BBB-</td></tr>
+          <tr><td>Ibuprofen</td><td>206</td><td>3.97</td><td class="y">BBB+</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:1rem;font-size:.75rem;color:#555;line-height:1.6">
+        <a href="https://github.com/HildaPosada/Chemical-Molecule-Property-Prediction-Using-Neural-Networks" target="_blank" style="color:#00c896;text-decoration:none">View model code on GitHub →</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function setSMILES(btn,smiles){
+  document.getElementById('smiles').value=smiles;
+  const presets={
+    'CC(=O)Oc1ccccc1C(=O)O':{mw:180.16,logp:1.19,hbd:1,hba:4},
+    'CN1CCC[C@H]1c2cccnc2':{mw:162.23,logp:1.17,hbd:0,hba:2},
+    'CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C':{mw:288.43,logp:3.17,hbd:1,hba:2},
+    'OC(=O)c1ccc(N)cc1':{mw:137.14,logp:0.83,hbd:2,hba:3},
+    'c1ccc2c(c1)cc1ccc3cccc4ccc2c1c34':{mw:202.25,logp:4.88,hbd:0,hba:0},
+    'CC(C)Cc1ccc(cc1)C(C)C(=O)O':{mw:206.29,logp:3.97,hbd:1,hba:2},
+  };
+  if(presets[smiles]){
+    document.getElementById('mw').value=presets[smiles].mw;
+    document.getElementById('logp').value=presets[smiles].logp;
+    document.getElementById('hbd').value=presets[smiles].hbd;
+    document.getElementById('hba').value=presets[smiles].hba;
+  }
+}
+function predict(){
+  const examples={
+    'CC(=O)Oc1ccccc1C(=O)O':{mw:180.16,logp:1.19,hbd:1,hba:4},
+    'CN1CCC[C@H]1c2cccnc2':{mw:162.23,logp:1.17,hbd:0,hba:2},
+    'CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C':{mw:288.43,logp:3.17,hbd:1,hba:2},
+    'OC(=O)c1ccc(N)cc1':{mw:137.14,logp:0.83,hbd:2,hba:3},
+    'c1ccc2c(c1)cc1ccc3cccc4ccc2c1c34':{mw:202.25,logp:4.88,hbd:0,hba:0},
+    'CC(C)Cc1ccc(cc1)C(C)C(=O)O':{mw:206.29,logp:3.97,hbd:1,hba:2},
+  };
+  const value=document.getElementById('smiles').value.trim();
+  if (!examples[value]) {document.getElementById('resultCard').className='result-card show';document.getElementById('verdict').textContent='Unsupported input';document.getElementById('verdict-sub').textContent='Select one of the six examples. This rule demo is not connected to the trained model and cannot validate arbitrary SMILES.';document.getElementById('probVal').textContent='—';document.getElementById('probBar').style.width='0%';document.getElementById('propGrid').replaceChildren();return;}
+  if (![...document.querySelectorAll('input[type=number]')].every(input=>input.value!==''&&input.checkValidity()&&Number.isFinite(Number(input.value)))) {document.getElementById('verdict').textContent='Invalid descriptors';return;}
+
+  const mw=+document.getElementById('mw').value;
+  const logp=+document.getElementById('logp').value;
+  const hbd=+document.getElementById('hbd').value;
+  const hba=+document.getElementById('hba').value;
+  // Hand-written illustrative descriptor rules; no model weights are loaded
+  let score=0.5;
+  if(mw<450) score+=0.15; else score-=0.2;
+  if(logp>0&&logp<5) score+=0.2; else if(logp<0) score-=0.15; else score-=0.1;
+  if(hbd<=3) score+=0.1; else score-=0.2;
+  if(hba<=7) score+=0.05; else score-=0.15;
+  score=Math.min(0.97,Math.max(0.03,score));
+  const bbb=score>0.5;
+  document.getElementById('placeholder').style.display='none';
+  const rc=document.getElementById('resultCard');rc.className='result-card show '+(bbb?'bbb-yes':'bbb-no');
+  document.getElementById('verdict').className='verdict '+(bbb?'yes':'no');
+  document.getElementById('verdict').textContent=bbb?'Rules favor permeability':'Rules disfavor permeability';
+  document.getElementById('verdict-sub').textContent='Illustrative descriptor rule score, not a model probability or a validated prediction.';
+  document.getElementById('probVal').textContent=(score*100).toFixed(1)+'%';
+  document.getElementById('probBar').style.width=(score*100)+'%';
+  document.getElementById('propGrid').innerHTML=[
+    ['MW',mw+' g/mol',mw<450?'#00c896':'#f43f5e'],
+    ['LogP',logp.toFixed(2),(logp>0&&logp<5)?'#00c896':'#f43f5e'],
+    ['H-Bond Donors',hbd,hbd<=3?'#00c896':'#f43f5e'],
+    ['H-Bond Acceptors',hba,hba<=7?'#00c896':'#f43f5e'],
+  ].map(([n,v,c])=>`<div class="prop"><div class="prop-name">${n}</div><div class="prop-val" style="color:${c}">${v}</div></div>`).join('');
+}
+predict();
+</script>
+</body>
+</html>
