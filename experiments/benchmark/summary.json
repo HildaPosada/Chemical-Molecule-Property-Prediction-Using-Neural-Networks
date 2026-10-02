@@ -1,0 +1,66 @@
+{
+  "dataset": "Committed BBBP SQLite split",
+  "valid_train_rows": 1424,
+  "valid_test_rows": 308,
+  "canonical_structure_overlap_train_test": 12,
+  "checkpoint_sha256": "76320b2ac11ee7ca9f6734fd68b5a1733852ac256da36f78e96b75f6953ed361",
+  "threshold": 0.5,
+  "results": {
+    "committed_neural_network": {
+      "accuracy": 0.8506493506493507,
+      "precision": 0.9315068493150684,
+      "recall": 0.8680851063829788,
+      "f1": 0.8986784140969163,
+      "roc_auc": 0.8975225881667153,
+      "confusion_matrix": [
+        [
+          58,
+          15
+        ],
+        [
+          31,
+          204
+        ]
+      ]
+    },
+    "logistic_regression": {
+      "accuracy": 0.8668831168831169,
+      "precision": 0.907563025210084,
+      "recall": 0.9191489361702128,
+      "f1": 0.9133192389006343,
+      "roc_auc": 0.887962693092393,
+      "confusion_matrix": [
+        [
+          51,
+          22
+        ],
+        [
+          19,
+          216
+        ]
+      ]
+    },
+    "class_prior": {
+      "accuracy": 0.762987012987013,
+      "precision": 0.762987012987013,
+      "recall": 1.0,
+      "f1": 0.8655616942909761,
+      "roc_auc": 0.5,
+      "confusion_matrix": [
+        [
+          0,
+          73
+        ],
+        [
+          0,
+          235
+        ]
+      ]
+    }
+  },
+  "limitations": [
+    "Retrospective saved split; training history is not independently reconstructed.",
+    "Canonical structure overlap can inflate random-split performance.",
+    "Model scores are not calibrated probabilities or clinical evidence."
+  ]
+}

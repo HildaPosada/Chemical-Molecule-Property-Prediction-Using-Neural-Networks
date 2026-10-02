@@ -7,6 +7,8 @@ from src.utils import load_config
 from src.models import create_model
 from src.data import MoleculePreprocessor
 import os
+import json
+from pathlib import Path
 import sys
 import streamlit as st
 import torch
@@ -504,6 +506,22 @@ def main():
         st.dataframe(comparison, use_container_width=True, hide_index=True)
         st.download_button("Download comparison CSV", comparison.to_csv(index=False).encode("utf-8"),
                            "neuropass-comparison.csv", "text/csv")
+
+    with st.expander("Inspect model evaluation and mistakes"):
+        report_path = Path("experiments/benchmark/summary.json")
+        if report_path.exists():
+            report = json.loads(report_path.read_text())
+            metrics = pd.DataFrame(report["results"]).T
+            st.dataframe(metrics.drop(columns=["confusion_matrix"]), use_container_width=True)
+            st.caption(f"Saved test split: {report['valid_test_rows']} valid molecules. Exact canonical structures shared with training: {report['canonical_structure_overlap_train_test']}.")
+            st.write("The logistic baseline has higher accuracy on this split; the neural network has higher ROC-AUC. A stronger model claim needs scaffold-disjoint validation.")
+            st.caption("These are retrospective results. Model scores are uncalibrated and are not clinical evidence.")
+            errors_path = Path("experiments/benchmark/errors.csv")
+            if errors_path.exists():
+                errors = pd.read_csv(errors_path)
+                st.write("Incorrect test predictions")
+                st.dataframe(errors[["name", "smiles", "p_np", "bbb_score", "predicted_label"]], hide_index=True)
+                st.download_button("Download test errors", errors.to_csv(index=False), "neuropass-test-errors.csv", "text/csv")
 
     # Information section
     st.markdown("---")
