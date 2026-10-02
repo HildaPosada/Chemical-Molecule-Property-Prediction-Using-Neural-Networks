@@ -19,7 +19,7 @@ from copy import deepcopy
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-APP_BUILD = "2026-06-01"
+APP_BUILD = "2026-10-01-svg"
 
 
 # Try to import RDKit chemistry modules.
@@ -248,18 +248,21 @@ def predict_molecule(smiles: str, model, preprocessor, device):
 
 
 def draw_molecule(smiles: str):
-    """Draw molecule structure from SMILES."""
+    """Render molecular structure as SVG without requiring the Cairo PNG backend."""
     if not RDKIT_CHEM_AVAILABLE:
         return None
 
     try:
-        from rdkit.Chem import Draw
+        from rdkit.Chem.Draw import rdMolDraw2D
+
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
             return None
 
-        img = Draw.MolToImage(mol, size=(400, 400))
-        return img
+        drawer = rdMolDraw2D.MolDraw2DSVG(400, 400)
+        rdMolDraw2D.PrepareAndDrawMolecule(drawer, mol)
+        drawer.FinishDrawing()
+        return drawer.GetDrawingText()
     except Exception:
         return None
 
