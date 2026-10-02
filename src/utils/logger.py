@@ -89,7 +89,7 @@ def get_logger(name: Optional[str] = None) -> logging.Logger:
 class TensorBoardLogger:
     """TensorBoard logging wrapper."""
 
-    def __init__(self, log_dir: str = "runs", experiment_name: Optional[str] = None):
+    def __init__(self, log_dir: str = "experiments/runs", experiment_name: Optional[str] = None):
         """
         Initialize TensorBoard logger.
 

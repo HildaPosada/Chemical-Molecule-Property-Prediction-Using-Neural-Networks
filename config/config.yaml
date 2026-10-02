@@ -133,7 +133,7 @@ logging:
 
   # TensorBoard
   use_tensorboard: true
-  tensorboard_dir: "runs"
+  tensorboard_dir: "experiments/runs"
 
   # Weights & Biases (optional)
   use_wandb: false
@@ -142,9 +142,9 @@ logging:
 
 # Visualization
 visualization:
-  results_dir: "results"
-  figures_dir: "results/figures"
-  metrics_dir: "results/metrics"
+  results_dir: "experiments/results"
+  figures_dir: "experiments/results/figures"
+  metrics_dir: "experiments/results/metrics"
 
   # Plot settings
   dpi: 300

@@ -92,21 +92,21 @@ Results demonstrate that engineered molecular fingerprints with standard neural 
 <td width="33%">
 
 **Confusion Matrix**
-![Confusion Matrix](results/figures/test_confusion_matrix.png)
+![Confusion Matrix](experiments/results/figures/test_confusion_matrix.png)
 Strong true positive rate (204) with minimal false positives (15)
 
 </td>
 <td width="33%">
 
 **ROC Curve**
-![ROC Curve](results/figures/test_roc_curve.png)
+![ROC Curve](experiments/results/figures/test_roc_curve.png)
 AUC = 0.90 shows excellent discrimination
 
 </td>
 <td width="33%">
 
 **Performance Metrics**
-![Metrics](results/figures/test_metrics.png)
+![Metrics](experiments/results/figures/test_metrics.png)
 Comprehensive evaluation across all metrics
 
 </td>
@@ -148,21 +148,18 @@ Dense(2) → Softmax → Prediction (BBB+/BBB-)
 
 ## Project Structure
 
+```text
+src/          Core data, model, training, and evaluation code
+api/          FastAPI prediction service
+app.py        Streamlit app entry point
+web/          Separate browser demonstration
+config/       Training and inference configuration
+data/         Dataset and preprocessing artifacts
+models/       Trained model checkpoints
+experiments/  Notebooks, evaluation results, and TensorBoard runs
+scripts/      Training, evaluation, and setup commands
+docs/         Setup and deployment guides
 ```
-├── src/                    # Core implementation
-│   ├── data/              # Data loading, SMILES processing, feature extraction
-│   ├── models/            # Neural network architectures
-│   ├── training/          # Training loops, callbacks, optimization
-│   ├── evaluation/        # Metrics computation, visualization
-│   └── utils/             # Configuration, logging, device management
-├── scripts/               # Command-line tools (train, evaluate, predict)
-├── config/                # YAML configurations
-├── results/               # Visualizations and metrics
-├── models/                # Trained model checkpoints
-└── notebooks/             # Exploratory analysis
-```
-
----
 
 ## Quick Start
 

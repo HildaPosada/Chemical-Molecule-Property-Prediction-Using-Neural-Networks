@@ -21,7 +21,7 @@ plt.rcParams['font.size'] = 10
 class Visualizer:
     """Handles visualization of training results and model evaluation."""
 
-    def __init__(self, save_dir: str = "results/figures", dpi: int = 300):
+    def __init__(self, save_dir: str = "experiments/results/figures", dpi: int = 300):
         """
         Initialize visualizer.
 

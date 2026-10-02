@@ -150,7 +150,7 @@ src/
 └── utils/        # Utilities and helpers
 
 scripts/          # Command-line scripts
-notebooks/        # Jupyter notebooks
+experiments/notebooks/        # Jupyter notebooks
 tests/           # Unit tests
 ```
 

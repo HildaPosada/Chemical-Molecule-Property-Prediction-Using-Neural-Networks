@@ -55,8 +55,8 @@ python scripts/evaluate.py \
   --config config/config_codespaces.yaml
 
 # Check the results
-ls results/figures/        # Plots and visualizations
-ls results/metrics/        # Performance metrics
+ls experiments/results/figures/        # Plots and visualizations
+ls experiments/results/metrics/        # Performance metrics
 ```
 
 ## Step 5: Make Predictions
@@ -92,10 +92,10 @@ cat predictions.csv
 
 After training, you'll have:
 
-1. **Training curves**: `results/figures/training_history.png`
-2. **Confusion matrix**: `results/figures/test_confusion_matrix.png`
-3. **ROC curve**: `results/figures/test_roc_curve.png`
-4. **Metrics**: `results/metrics/test_metrics.json`
+1. **Training curves**: `experiments/results/figures/training_history.png`
+2. **Confusion matrix**: `experiments/results/figures/test_confusion_matrix.png`
+3. **ROC curve**: `experiments/results/figures/test_roc_curve.png`
+4. **Metrics**: `experiments/results/metrics/test_metrics.json`
 
 Right-click any file → **Download** to save to your computer!
 
@@ -140,7 +140,7 @@ tail -f logs/*.log
 ### Commit & Push Regularly
 
 ```bash
-git add models/ results/ logs/
+git add models/ experiments/results/ logs/
 git commit -m "Training results - achieved X% accuracy"
 git push
 ```
@@ -149,8 +149,8 @@ git push
 
 Right-click in VS Code → Download:
 - `models/checkpoints/best_model.pth`
-- `results/figures/` folder
-- `results/metrics/` folder
+- `experiments/results/figures/` folder
+- `experiments/results/metrics/` folder
 
 ## 🐛 Troubleshooting
 
@@ -221,8 +221,8 @@ With the Codespaces config, you should get:
 
 After training, showcase:
 
-1. **Performance metrics** from `results/metrics/`
-2. **Visualizations** from `results/figures/`
+1. **Performance metrics** from `experiments/results/metrics/`
+2. **Visualizations** from `experiments/results/figures/`
 3. **Model architecture** (in README)
 4. **Training curves** showing convergence
 5. **Example predictions** on drug-like molecules

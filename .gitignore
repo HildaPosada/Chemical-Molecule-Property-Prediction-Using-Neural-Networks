@@ -207,7 +207,7 @@ marimo/_lsp/
 __marimo__/
 
 # Project-specific
-runs/
+experiments/runs/
 logs/
 *.db
 *.pkl

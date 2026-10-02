@@ -99,8 +99,8 @@ After training completes:
 python scripts/evaluate.py --model-path models/checkpoints/best_model.pth --config config/config_codespaces.yaml
 
 # View results
-ls results/figures/
-ls results/metrics/
+ls experiments/results/figures/
+ls experiments/results/metrics/
 ```
 
 ## Making Predictions
@@ -120,7 +120,7 @@ python scripts/predict.py --input-file molecules.csv --output predictions.csv --
 jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser
 
 # Or use VS Code's built-in Jupyter support
-# Just open notebooks/00_quickstart.ipynb
+# Just open experiments/notebooks/00_quickstart.ipynb
 ```
 
 ## Storage Considerations
@@ -219,8 +219,8 @@ Right-click on files/folders in VS Code → Download
 
 Important to download:
 - `models/checkpoints/best_model.pth`
-- `results/figures/` (all plots)
-- `results/metrics/` (performance metrics)
+- `experiments/results/figures/` (all plots)
+- `experiments/results/metrics/` (performance metrics)
 
 ## Resources
 

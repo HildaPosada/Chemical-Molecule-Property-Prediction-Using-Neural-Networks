@@ -4,9 +4,9 @@ This guide is the source of truth for deploying NeuroPass quickly for demo use a
 
 ## Current Status
 
-- FastAPI backend exists in [api/main.py](api/main.py)
-- Streamlit app exists in [app.py](app.py)
-- Render config exists in [render.yaml](render.yaml)
+- FastAPI backend exists in [api/main.py](../api/main.py)
+- Streamlit app exists in [app.py](../app.py)
+- Render config exists in [render.yaml](../render.yaml)
 - Frontend (NativelyAI/Vite) is a separate project and must point to the deployed API URL
 
 ## Immediate Tasks
@@ -19,7 +19,7 @@ This guide is the source of truth for deploying NeuroPass quickly for demo use a
 ## Deploy FastAPI to Render
 
 1. Go to Render and create a new Blueprint or Web Service from this repo.
-2. If using Blueprint, Render will read [render.yaml](render.yaml).
+2. If using Blueprint, Render will read [render.yaml](../render.yaml).
 3. Confirm these values:
    - Build command: pip install -r requirements.txt
    - Start command: uvicorn api.main:app --host 0.0.0.0 --port $PORT

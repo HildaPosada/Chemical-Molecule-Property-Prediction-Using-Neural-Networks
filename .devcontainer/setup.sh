@@ -37,7 +37,7 @@ pip install -r requirements.txt -q
 echo "📁 Creating project directories..."
 mkdir -p data/raw data/processed
 mkdir -p models/saved_models models/checkpoints
-mkdir -p results/figures results/metrics
+mkdir -p experiments/results/figures experiments/results/metrics
 mkdir -p logs runs
 
 # Install the package in development mode
