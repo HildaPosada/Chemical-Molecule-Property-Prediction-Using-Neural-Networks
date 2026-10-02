@@ -282,10 +282,10 @@ def get_molecular_properties(smiles: str):
         properties = {
             'Molecular Weight': f"{Descriptors.MolWt(mol):.2f} g/mol",
             'LogP': f"{Descriptors.MolLogP(mol):.2f}",
-            'H-Bond Donors': Descriptors.NumHDonors(mol),
-            'H-Bond Acceptors': Descriptors.NumHAcceptors(mol),
-            'Rotatable Bonds': Descriptors.NumRotatableBonds(mol),
-            'Aromatic Rings': Descriptors.NumAromaticRings(mol),
+            'H-Bond Donors': str(Descriptors.NumHDonors(mol)),
+            'H-Bond Acceptors': str(Descriptors.NumHAcceptors(mol)),
+            'Rotatable Bonds': str(Descriptors.NumRotatableBonds(mol)),
+            'Aromatic Rings': str(Descriptors.NumAromaticRings(mol)),
             'TPSA': f"{Descriptors.TPSA(mol):.2f} A^2"
         }
         return properties
