@@ -2,7 +2,7 @@
 
 ## Verified deployment status · October 1, 2026
 
-The primary [NeuroPass app](https://neuropass.streamlit.app/) runs the trained PyTorch model with RDKit molecular features. Verified aspirin and nicotine predictions (57.5% and 92.1% BBB-positive probability respectively) and invalid-SMILES rejection. These smoke tests verify the inference flow, not overall prediction accuracy. The [older web demonstration](https://molecule-demo.vercel.app/) remains available as a clearly labeled six-example rule demo, separate from the trained model.
+The primary [NeuroPass app](https://neuropass.streamlit.app/) runs the trained PyTorch model with RDKit molecular features. Verified aspirin and nicotine predictions (57.5% and 92.1% BBB-positive probability respectively) and invalid-SMILES rejection. Molecular structures now render as SVG with the required Linux drawing libraries declared in `packages.txt`. Verified the structure image and prediction together after deployment. These smoke tests verify the inference flow, not overall prediction accuracy. The [older web demonstration](https://molecule-demo.vercel.app/) remains available as a clearly labeled six-example rule demo, separate from the trained model.
 See [deployment source and scope](web/README.md) and the [portfolio audit](https://github.com/HildaPosada/hildaposada.github.io/blob/master/docs/project_audit.md). Historical descriptions below are not evidence of a connected production backend.
 
 
