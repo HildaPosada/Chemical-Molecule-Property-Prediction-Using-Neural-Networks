@@ -264,6 +264,8 @@ def draw_molecule(smiles: str):
         drawer.FinishDrawing()
         return drawer.GetDrawingText()
     except Exception:
+        import logging
+        logging.getLogger(__name__).exception("Molecular SVG rendering failed")
         return None
 
 
