@@ -251,12 +251,3 @@ python scripts/predict.py --smiles "CC(C)Cc1ccc(cc1)C(C)C(O)=O"  # Ibuprofen
 
 MIT License - see [LICENSE](LICENSE)
 
-## Contact
-
-**Hilda Posada**
-Bridging Chemistry and Machine Learning
-[GitHub](https://github.com/HildaPosada) | [LinkedIn](https://linkedin.com/in/hildaposada)
-
----
-
-*This project demonstrates the intersection of computational chemistry and deep learning—foundational skills for quantum computing applications in molecular science and materials discovery.*
